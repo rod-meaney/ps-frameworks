@@ -1,0 +1,10 @@
+{
+	"BaseConfig": "{Drive}:\\work\\git-personal\\ps-frameworks\\SJobs\\BaseConfig.json",
+    "Purge":[
+        {"pattern":"{Drive}:\\Temp\\*.*","days":15}
+    ],
+    "EmailSummaryTo":"to peeps",
+    "EmailSummarySubject":"Write an Email send function",
+    "EmailSummaryFrom":"from address",
+    "EmailSummaryHelpURL": {"name":"Job Help", "url":"Confluence_URL"}
+}

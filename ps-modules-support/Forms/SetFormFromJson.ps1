@@ -3,7 +3,6 @@ function Set-FormFromJson {
     param (
 		[Parameter(Mandatory=$true)] $JsonFile
     )
-    #$JsonFile = "C:\work\git\SupportTools\SupportUtilitiesPS\LMSForms\NewLoyaltySupportForm.json"
 
     $FormElements = @{}
     $configText = (Get-Content -Path $JsonFile -Raw)
