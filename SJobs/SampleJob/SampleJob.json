@@ -3,7 +3,7 @@
     "Purge":[
         {"pattern":"{Drive}:\\Temp\\*.*","days":15}
     ],
-    "EmailSummaryTo":"to peeps",
+    "EmailSummaryTo":"Many Peeps",
     "EmailSummarySubject":"Write an Email send function",
     "EmailSummaryFrom":"from address",
     "EmailSummaryHelpURL": {"name":"Job Help", "url":"Confluence_URL"}

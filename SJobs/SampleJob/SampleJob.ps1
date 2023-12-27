@@ -11,7 +11,7 @@ try{
     }
 
     #===== Script below here =====
-
+    write-log "Maybe this will send and email to $($SJobConfig.EmailSummaryTo)" INFO
 
     #===== Script above here =====
     
