@@ -6,15 +6,12 @@ function Get-Next3TramsMinutes {
         [Parameter(Mandatory=$true)] $Route
     )
     #$TramStop='1649'
-    $URL = "http://tramtracker.com.au/Controllers/GetNextPredictionsForStop.ashx?stopNo={0}&routeNo={1}&isLowFloor=false&ts={2}"
-    $EpochTime = Get-Date -UFormat %s
-    Write-host "Epoch: $($EpochTime)"
-    $Result = Invoke-WebRequest -Uri ($URL -f $TramStop,$Route,$EpochTime) -Method Get
-    $ResultObj = ConvertFrom-Json $Result.Content
+    $JsonResp = Get-TramTrackerResponse -TramStop $TramStop -Route $Route
+    $ResultObj = ConvertFrom-Json $JsonResp
     $CurrentDT = Get-Date
     $OutItems = New-Object System.Collections.Generic.List[System.Object]
     foreach($tram in $ResultObj.responseObject){
-        Write-host "Response: $($tram.PredictedArrivalDateTime)"
+        Write-Verbose "Response: $($tram.PredictedArrivalDateTime)"
         try {
             $TramDT = Get-Date $tram.PredictedArrivalDateTime
         } catch {
