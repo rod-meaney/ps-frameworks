@@ -59,9 +59,29 @@ function Set-FormElementsFromJson {
                 $Button.Text        = $el.Text
                 $Button.Location    = New-Object System.Drawing.Size($el.x,$el.y)
                 $Button.Size        = New-Object System.Drawing.Size($el['Size-x'],$el['Size-y'])
-                $Button.Font         = $FontStyle
+                $Button.Font        = $FontStyle
                 $FormOrTabHash.Add($el.Name, $Button)
                 $FormOrTab.Controls.Add($Button)
+            }
+            "ListView" {
+                #https://info.sapien.com/index.php/guis/gui-controls/spotlight-on-the-listview-control
+                #https://www.sapien.com/blog/2012/04/04/spotlight-on-the-listview-control-part-1/
+                #https://www.sapien.com/blog/2012/04/05/spotlight-on-the-listview-control-part-2/
+                $ListView            = New-Object System.Windows.Forms.ListView
+                $ListView.Location   = New-Object System.Drawing.Point($el.x,$el.y)
+                $ListView.Width      = $el.Width
+                $ListView.Height     = $el.Height  
+                $ListView.GridLines  = $true
+                $ListView.View       = [System.Windows.Forms.View]::Details
+                $ListView.FullRowSelect = $true
+
+                $ListView.Columns.Add($el.Item, -2, [System.Windows.Forms.HorizontalAlignment]::Left) | Out-Null
+                foreach($col in $el.SubItems){
+                  $ListView.Columns.Add($col, -2, [System.Windows.Forms.HorizontalAlignment]::Left) | Out-Null
+                }
+
+                $FormOrTabHash.Add($el.Name, $ListView)
+                $FormOrTab.Controls.Add($ListView)
             }
             "ListBox" {
                 $listBox            = New-Object System.Windows.Forms.ListBox
@@ -69,6 +89,7 @@ function Set-FormElementsFromJson {
                 $listBox.Width      = $el.Width
                 $listBox.Height     = $el.Height
                 $listBox.Font       = New-Object System.Drawing.Font("Courier New",$FontSize,[System.Drawing.FontStyle]::Regular)
+                if($el.SelectionMode) {$listBox.SelectionMode = "$($el.SelectionMode)"}
                 if($el.Items) {$el.Items | ForEach-Object {[void] $listBox.Items.Add($_)}} 
                 $FormOrTabHash.Add($el.Name, $listBox)
                 $FormOrTab.Controls.Add($listBox)
@@ -110,3 +131,37 @@ function Set-FormElementsFromJson {
     }
 }
 Export-ModuleMember -Function Set-FormElementsFromJson
+
+# ============== LISTVIEW Helpers ==============
+function Set-ListViewElementsFromData {
+    #BEST to make SQL Result or imported CSV as string-like as possible. i.e. do string conversions in SQL or creation of your csv
+    [CmdletBinding()]
+    param (
+		[Parameter(Mandatory=$true)] [System.Windows.Forms.ListView]$ListView,
+        [Parameter(Mandatory=$true, HelpMessage="Data can be an csv that has been imported, or a result set from SQL")] $Data
+    )
+    foreach($row in $Data){
+        $ColName = $ListView.Columns[0].Text
+        $item1 = [System.Windows.Forms.ListViewItem]::new(($row."$ColName"),0)
+        for($i=1;$i -lt $ListView.Columns.count;$i++){
+          $ColName = $ListView.Columns[$i].Text
+          $item1.SubItems.Add([string]$row."$ColName") | Out-Null 
+        }
+        $ListView.Items.Add($item1) | Out-Null
+      }
+}
+Export-ModuleMember -Function Set-ListViewElementsFromData
+function New-LineDataFromListViewItem {
+    [CmdletBinding()]
+    param (
+		[Parameter(Mandatory=$true)] $item
+    )
+    $data = @{}
+    $i=0
+    foreach($col in $item.ListView.Columns){
+        $data.Add($col.Text,$item.SubItems[$i].Text)
+        $i++
+    }
+    return $data
+}
+Export-ModuleMember -Function New-LineDataFromListViewItem
